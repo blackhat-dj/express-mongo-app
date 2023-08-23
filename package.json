@@ -4,7 +4,7 @@
   "description": "express-mongo-app",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon src/app.js"
   },
   "keywords": [],
   "author": "",
