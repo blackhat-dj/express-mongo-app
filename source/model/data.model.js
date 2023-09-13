@@ -9,10 +9,17 @@ const carSchema = mongoose.Schema(
 }
 );
 
+const purchaseSchema = mongoose.Schema(
+    {   OrderId : Number,
+        ref : carSchema,
+        Date : Date         
+  }
+  );
+
 let cars = mongoose.model('Cars', carSchema)
-let purchase = mongoose.model('Purchase', carSchema)
+let purchases = mongoose.model('Purchase', purchaseSchema)
 
 module.exports = {
     cars : cars,
-    purchase : purchase
+    purchases : purchases
 }
