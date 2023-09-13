@@ -1,5 +1,5 @@
 const { ObjectId } = require('bson');
-const { purchase, cars, purchases } = require('../model/data.model');
+const { cars, purchases } = require('../model/data.model');
 const Cars = require('../model/data.model').cars;
 const Purchase = require('../model/data.model').purchases;
 
