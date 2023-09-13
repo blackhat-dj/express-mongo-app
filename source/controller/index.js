@@ -38,7 +38,7 @@ exports.get = (req, res) => {
                             //Updating Car Collection & Inserting Data in Purchase 
 exports.findOne = async (req, res) => {
     if(req.body. brand != null && req.body.model != null && req.body.carId != null) {
-         res.json({message : "Thanks for purchasing " + req.body.brand});
+         
         const x = Math.floor(10000 +  Math.random()*99999  );
         console.log("Order Id : ", x);
 
@@ -56,11 +56,17 @@ exports.findOne = async (req, res) => {
          }) .catch (error => {
              console.log(error);
          })
+        
 
-    await Cars.find({status : "SOLD"}).populate('purchases').exec();
+         const data = await Cars.find({status : "SOLD"})
+         return Purchase.collection.insertMany(data,(err, records) => {
+             console.log(records);
+
+             res.json({message : "Thanks for purchasing " + req.body.brand});
+         })
          
-    } //if statement
-}  // top level sync
+    } else { res.status(500).send({message : "Insufficient data.Please verify it..!"})}
+}  
 
                                 //Updated Car Collection
 
