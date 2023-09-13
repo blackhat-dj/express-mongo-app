@@ -1,7 +1,7 @@
 const { ObjectId } = require('bson');
-const { purchase, cars } = require('../model/data.model');
+const { purchase, cars, purchases } = require('../model/data.model');
 const Cars = require('../model/data.model').cars;
-const Purchase = require('../model/data.model').purchase;
+const Purchase = require('../model/data.model').purchases;
 
                                 //Creating A Collection
 exports.create = (req, res) => {
@@ -10,15 +10,15 @@ exports.create = (req, res) => {
         return;
     }
     const cars = new Cars({
-        id: req.params.id,
+        _id: req.body.id,
         brand : req.body.brand,
         model : req.body.model,
         carId : req.body.carId,
-        price : req.params.price,
+        price : req.body.price,
         status : req.body.status    
     });
     cars.save()
-        .then (data => {res.send(data)})
+        .then (data => {res.send("Succesfully Created")})
         .catch (err => { res.staus(500).send({err : error.message})
     });
 };
@@ -35,83 +35,45 @@ exports.get = (req, res) => {
         });
     }
 
-                            //Finding a Particular value by ID
-exports.findOne = (req, res) => {
-        Cars.findById(req.params.carId)
-        .then(cars => {
-            if(!cars) {
-                return res.status(404).send({message: "Car not found with id " + req.params.carId});            
-            } else { 
-            res.status(201).send(cars);
-            }
-            })
-        .catch (err => {
-                res.status(500).send({ message : "Error Retrieved" + req.params.carId})
+                            //Updating Car Collection & Inserting Data in Purchase 
+exports.findOne = async (req, res) => {
+    if(req.body. brand != null && req.body.model != null && req.body.carId != null) {
+         res.json({message : "Thanks for purchasing " + req.body.brand});
+        const x = Math.floor(10000 +  Math.random()*99999  );
+        console.log("Order Id : ", x);
+
+        const date =  new Date().toLocaleDateString();
+        console.log("Date : " , date);
+
+        const document = {OrderId : x, Date : date}
+        Purchase.collection.insertOne(document,(err, records) => {
+            console.log(records);
         })
-        }
+    
+     await Cars.findOneAndUpdate({carId : req.body.carId, status : "AVAILABLE"}, {status: "SOLD"} , {new : true})
+            .then(result => {
+             res.status(201)
+         }) .catch (error => {
+             console.log(error);
+         })
 
-                                //Updating Collection
-exports.update = async (req, res) => {
-    const id = req.params.carId;
-    let updates={}
-    if (!req.body.status) {
-        updates["status"] = req.body.status
-    }
-    await Cars.findOneAndUpdate(id, {$set: req.body.cars} , {new : true},
-        function (err, cars) {
-            if (err){
-                console.log(err)
-            }
-            else{
-                console.log("Cars purchased : ", cars);
-            }
-        });
-  };
-
-                                //Data From One Collection To Another
-  exports.getData = async function (){ 
-    Cars.find({}, async function(err1, userInfo){   
-        if (err1) return console.log(err1) 
-        for(let i in userInfo){
-            try{
-                let backUp = new Purchase(cars[i])
-                await purchase.save(function (err2, user) {
-                    if (err2) return console.error(err2)
-                    console.log("collection updated")
-                })
-            }
-            catch(err){
-                console.log(err)
-            }
-        }
-    })
-};
-
-                                //Adding Values To Updated Collection
-
-exports.addData = (req, res) => {
-    let x =Math.floor(10000 +  Math.random()*99999  );
-        console.log(x);
-     econsole.log({date: new Date().toISOString()});
-};
+    await Cars.find({status : "SOLD"}).populate('purchases').exec();
+         
+    } //if statement
+}  // top level sync
 
                                 //Updated Car Collection
 
-exports.updatedData = (req,res) => { 
-    if(req.body.status != "AVAILABLE") {
-        res.send(404).send ({
-            message : "Cannot find Data"
-        })
-    }
-    Cars.find()
+exports.updatedData = async(req,res) => { 
+    await Cars.find({status : "SOLD"})
     .then (cars => {
         res.send(cars);
-    })
-    .catch (err => {
-        res.status(500).send({
-            message : err.message  });
-    });
-    };
+         })
+     .catch (err => {
+        res.status(404).send({
+        message : err.message  });
+     });
+};
 
                                     // Updated Purchase Collection
 exports.purchaseData = (req,res) => { 
@@ -120,7 +82,7 @@ exports.purchaseData = (req,res) => {
        res.send(purchase);
         })
     .catch (err => {
-       res.status(500).send({
+       res.status(404).send({
        message : err.message  });
     });
 };
