@@ -2,9 +2,9 @@ const express = require('express');
 
 const dotenv = require('dotenv')
 
-dotenv.config({path:__dirname+'/.env'});
+dotenv.config();
 
-const connectDB = require('./source/config/db.config');
+const connectDB = require('../src/config/db_config');
 
 connectDB({
     useNewUrlParser: true,
@@ -22,7 +22,7 @@ app.get('/', (req,res) => {
     res.json({message : "Welcome To My Application"})
 });
 
-require('./source/routes/index.js')(app);
+require('../src/routes/index')(app);
 
 const PORT = process.env.PORT || 3000;
     app.listen(3000, () => {
