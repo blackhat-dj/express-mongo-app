@@ -45,25 +45,27 @@ exports.findOne = async (req, res) => {
         const date =  new Date().toLocaleDateString();
         console.log("Date : " , date);
 
-        const document = {OrderId : x, Date : date}
-        Purchase.collection.insertOne(document,(err, records) => {
-            console.log(records);
-        })
-    
      await Cars.findOneAndUpdate({carId : req.body.carId, status : "AVAILABLE"}, {status: "SOLD"} , {new : true})
             .then(result => {
              res.status(201)
          }) .catch (error => {
              console.log(error);
-         })
-        
+         }) 
 
-         const data = await Cars.find({status : "SOLD"})
-         return Purchase.collection.insertMany(data,(err, records) => {
-             console.log(records);
+         
 
-             res.json({message : "Thanks for purchasing " + req.body.brand});
-         })
+         const document = {orderId : x, 
+             brand : req.body.brand,
+            model : req.body.model,
+            carId : req.body.carId,
+            price : await Cars.findOne({carId : req.body.carId}).get({price : Cars.price}),
+            Date : date
+}
+        await Purchase.collection.insertOne(document,(err, records) => {
+            console.log(records);
+        })
+         
+             res.json({message : "Thanks for purchasing " + req.body.brand});    
          
     } else { res.status(500).send({message : "Insufficient data.Please verify it..!"})}
 }  
